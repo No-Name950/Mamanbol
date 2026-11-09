@@ -1,0 +1,683 @@
+<title>MamanBol</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@600;700&display=swap">
+<style>
+  /* Layout: single-column flow, centered column max ~720px; one screen visible at a time.
+     Color: cool-neutral ground, deep teal app accent, six fixed RIASEC hues for the bars.
+     Type: Unbounded (display wordmark + headings, used sparingly) + Onest (body/UI). */
+  :root {
+    --bg: #eef2f5;
+    --surface: #ffffff;
+    --surface-2: #f5f8fa;
+    --ink: #142230;
+    --muted: #5c6f7e;
+    --line: #dde6 ec;
+    --line: #dde6ec;
+    --accent: #0e7c74;
+    --accent-ink: #0a5a54;
+    --accent-soft: #d8efec;
+    --shadow: 0 1px 2px rgba(20,34,48,.06), 0 10px 30px rgba(20,34,48,.07);
+    --radius: 18px;
+
+    --c-r: #c2582a; /* Реалистичное */
+    --c-i: #2d6cb0; /* Исследовательское */
+    --c-a: #a4409a; /* Артистическое */
+    --c-s: #2f9e6e; /* Социальное */
+    --c-e: #c08a1e; /* Предприимчивое */
+    --c-c: #5f6f93; /* Конвенциональное */
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e1620;
+      --surface: #16222e;
+      --surface-2: #1b2a37;
+      --ink: #e8eff4;
+      --muted: #97a8b6;
+      --line: #273645;
+      --accent: #2bb3a6;
+      --accent-ink: #4fd0c3;
+      --accent-soft: #123532;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 14px 34px rgba(0,0,0,.4);
+      --c-r: #e0794a;
+      --c-i: #5a93d6;
+      --c-a: #cc6bc2;
+      --c-s: #46c68f;
+      --c-e: #e0ad3e;
+      --c-c: #8695ba;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e1620;
+    --surface: #16222e;
+    --surface-2: #1b2a37;
+    --ink: #e8eff4;
+    --muted: #97a8b6;
+    --line: #273645;
+    --accent: #2bb3a6;
+    --accent-ink: #4fd0c3;
+    --accent-soft: #123532;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 14px 34px rgba(0,0,0,.4);
+    --c-r: #e0794a;
+    --c-i: #5a93d6;
+    --c-a: #cc6bc2;
+    --c-s: #46c68f;
+    --c-e: #e0ad3e;
+    --c-c: #8695ba;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Onest", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 760px;
+    margin-inline: auto;
+    padding-inline: 18px;
+    padding-block: 28px 56px;
+    min-height: 100%;
+  }
+  h1, h2, h3 { text-wrap: balance; margin: 0; }
+  .display { font-family: "Unbounded", "Onest", sans-serif; letter-spacing: -.01em; }
+  .eyebrow {
+    font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--accent-ink);
+  }
+  button { font-family: inherit; cursor: pointer; }
+  .btn {
+    border: 0; border-radius: 999px; padding: 15px 26px; font-size: 16px; font-weight: 600;
+    background: var(--accent); color: #fff; transition: transform .12s ease, filter .12s ease;
+    box-shadow: 0 6px 18px rgba(14,124,116,.28);
+  }
+  .btn:hover { filter: brightness(1.05); }
+  .btn:active { transform: translateY(1px); }
+  .btn.ghost {
+    background: transparent; color: var(--ink); box-shadow: none;
+    border: 1.5px solid var(--line); font-weight: 500;
+  }
+  .btn.ghost:hover { background: var(--surface-2); filter: none; }
+  .btn:disabled { opacity: .4; cursor: default; box-shadow: none; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 12px; }
+
+  /* ---------- Welcome ---------- */
+  .hero { display: flex; flex-direction: column; gap: 22px; padding-block: 24px; }
+  .logo-row { display: flex; align-items: center; gap: 12px; }
+  .mark {
+    width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center;
+    background: linear-gradient(140deg, var(--accent), var(--c-i));
+    color: #fff; font-family: "Unbounded"; font-weight: 700; font-size: 22px;
+    box-shadow: var(--shadow);
+  }
+  .brand { font-size: 26px; font-weight: 700; }
+  .hero h1 { font-size: clamp(30px, 7vw, 46px); line-height: 1.08; font-weight: 700; }
+  .hero h1 .hl { color: var(--accent-ink); }
+  .lead { font-size: 18px; color: var(--muted); max-width: 54ch; }
+  .meta-row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip {
+    font-size: 13px; font-weight: 500; color: var(--muted);
+    background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
+    padding: 7px 13px;
+  }
+  .dir-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .dir-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    padding: 13px 14px; display: flex; gap: 11px; align-items: flex-start;
+  }
+  .dir-dot { width: 11px; height: 11px; border-radius: 50%; margin-top: 5px; flex: none; }
+  .dir-card b { font-size: 14.5px; font-weight: 600; }
+  .dir-card span { display: block; font-size: 12.5px; color: var(--muted); }
+  .start-row { margin-top: 4px; }
+
+  /* ---------- Test ---------- */
+  .test-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 18px; }
+  .counter { font-size: 13px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .counter b { color: var(--ink); }
+  .progress { height: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+  .progress > i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--c-i)); border-radius: 999px; transition: width .35s cubic-bezier(.2,.8,.2,1); }
+
+  .qcard {
+    margin-top: 22px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 22px;
+  }
+  .q-tag { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+  .q-text { font-size: clamp(20px, 4.4vw, 26px); font-weight: 600; line-height: 1.25; margin: 10px 0 20px; }
+  .opts { display: flex; flex-direction: column; gap: 10px; }
+  .opt {
+    display: flex; align-items: center; gap: 13px; width: 100%; text-align: left;
+    background: var(--surface-2); border: 1.5px solid var(--line); border-radius: 13px;
+    padding: 14px 16px; font-size: 15.5px; color: var(--ink); font-weight: 500;
+    transition: border-color .12s ease, background .12s ease, transform .08s ease;
+  }
+  .opt:hover { border-color: var(--accent); }
+  .opt:active { transform: scale(.995); }
+  .opt .dot {
+    width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--line);
+    flex: none; display: grid; place-items: center; transition: border-color .12s;
+  }
+  .opt .dot::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); transform: scale(0); transition: transform .14s ease; }
+  .opt.sel { border-color: var(--accent); background: var(--accent-soft); }
+  .opt.sel .dot { border-color: var(--accent); }
+  .opt.sel .dot::after { transform: scale(1); }
+
+  .test-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 20px; }
+
+  .anim-in { animation: slideIn .32s cubic-bezier(.2,.8,.2,1); }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+  .anim-back { animation: slideBack .32s cubic-bezier(.2,.8,.2,1); }
+  @keyframes slideBack { from { opacity: 0; transform: translateX(-24px); } to { opacity: 1; transform: none; } }
+
+  /* ---------- Result ---------- */
+  .res-head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+  .res-head h2 { font-size: clamp(24px, 5.5vw, 34px); font-weight: 700; }
+  .panel {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 22px; margin-top: 22px;
+  }
+  .panel > h3 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .panel > .sub { font-size: 14px; color: var(--muted); margin-bottom: 16px; }
+  .bars { display: flex; flex-direction: column; gap: 14px; }
+  .bar-row { display: grid; grid-template-columns: 1fr; gap: 6px; }
+  .bar-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .bar-name { font-weight: 600; font-size: 15px; display: flex; align-items: center; gap: 9px; }
+  .bar-name .sw { width: 11px; height: 11px; border-radius: 50%; flex: none; }
+  .bar-name small { color: var(--muted); font-weight: 500; font-size: 12.5px; }
+  .bar-val { font-variant-numeric: tabular-nums; font-weight: 600; font-size: 14px; color: var(--muted); }
+  .track { height: 12px; background: var(--surface-2); border-radius: 999px; overflow: hidden; border: 1px solid var(--line); }
+  .track > i { display: block; height: 100%; width: 0; border-radius: 999px; transition: width .7s cubic-bezier(.2,.8,.2,1); }
+
+  .tops { display: flex; flex-direction: column; gap: 14px; }
+  .top-card {
+    border: 1px solid var(--line); border-left-width: 5px; border-radius: 13px;
+    padding: 15px 16px; background: var(--surface-2);
+  }
+  .top-card .tc-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 5px; }
+  .top-card h4 { font-size: 16px; font-weight: 700; margin: 0; }
+  .top-card .rank { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .top-card p { margin: 0; font-size: 14px; color: var(--ink); opacity: .9; }
+
+  .prof-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .prof {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 15px;
+    padding: 17px 17px 18px; display: flex; flex-direction: column; gap: 10px;
+  }
+  .prof-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .prof h4 { font-size: 17px; font-weight: 700; line-height: 1.2; }
+  .match {
+    flex: none; font-size: 12px; font-weight: 700; color: var(--accent-ink);
+    background: var(--accent-soft); border-radius: 999px; padding: 4px 10px;
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .prof .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .prof .tags span { font-size: 11px; font-weight: 600; color: #fff; border-radius: 999px; padding: 3px 9px; }
+  .prof .pdesc { font-size: 13.5px; color: var(--muted); }
+  .prof dl { margin: 0; display: flex; flex-direction: column; gap: 7px; }
+  .prof .field { font-size: 13px; }
+  .prof .field b { display: block; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 1px; font-weight: 700; }
+
+  .res-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 28px; }
+  .foot { text-align: center; color: var(--muted); font-size: 12.5px; margin-top: 34px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <!-- ============ WELCOME ============ -->
+  <section id="screen-welcome">
+    <div class="hero">
+      <div class="logo-row">
+        <div class="mark">M</div>
+        <div class="brand display">MamanBol</div>
+      </div>
+      <div class="eyebrow">Профориентация по модели RIASEC</div>
+      <h1 class="display">Поможем подобрать профессию под твои <span class="hl">сильные стороны</span></h1>
+      <p class="lead">Короткий тест из 24 утверждений покажет, к чему у тебя больше склонностей, и подберёт профессии, которые этому подходят — с нужными школьными предметами и примерами, куда поступать в Казахстане.</p>
+
+      <div class="meta-row">
+        <span class="chip">24 вопроса</span>
+        <span class="chip">≈ 5 минут</span>
+        <span class="chip">6 направлений склонностей</span>
+      </div>
+
+      <div class="dir-grid" id="dirGrid"></div>
+
+      <div class="start-row">
+        <button class="btn" id="startBtn">Начать тест →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TEST ============ -->
+  <section id="screen-test" hidden>
+    <div class="test-head">
+      <div class="logo-row">
+        <div class="mark" style="width:34px;height:34px;font-size:16px;border-radius:10px">M</div>
+        <strong class="display" style="font-size:18px">MamanBol</strong>
+      </div>
+      <div class="counter"><b id="qNum">1</b> / <span id="qTotal">24</span></div>
+    </div>
+    <div class="progress"><i id="progBar"></i></div>
+
+    <div class="qcard" id="qCard">
+      <div class="q-tag" id="qTag"></div>
+      <h2 class="q-text" id="qText"></h2>
+      <div class="opts" id="opts"></div>
+    </div>
+
+    <div class="test-nav">
+      <button class="btn ghost" id="backBtn">← Назад</button>
+      <button class="btn" id="nextBtn" disabled>Далее →</button>
+    </div>
+  </section>
+
+  <!-- ============ RESULT ============ -->
+  <section id="screen-result" hidden>
+    <div class="res-head">
+      <div class="eyebrow">Твой результат</div>
+      <h2 class="display">Вот как распределились твои склонности</h2>
+    </div>
+
+    <div class="panel">
+      <h3>Баллы по 6 направлениям</h3>
+      <div class="sub">Чем длиннее полоса, тем ближе тебе это направление.</div>
+      <div class="bars" id="bars"></div>
+    </div>
+
+    <div class="panel">
+      <h3>Твои ведущие направления</h3>
+      <div class="sub">На них стоит опираться при выборе профессии.</div>
+      <div class="tops" id="tops"></div>
+    </div>
+
+    <div class="panel">
+      <h3>Профессии, которые тебе подходят</h3>
+      <div class="sub">Отсортированы по совпадению с твоим профилем.</div>
+      <div class="prof-grid" id="profGrid"></div>
+    </div>
+
+    <div class="res-actions">
+      <button class="btn" id="restartBtn">↻ Пройти заново</button>
+    </div>
+    <p class="foot">MamanBol — ориентир, а не приговор. Результат помогает присмотреться к направлениям, а окончательный выбор всегда за тобой.</p>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------- RIASEC directions ----------
+  var DIRS = {
+    R: { name: "Реалистичное", tag: "техника и руки", color: "var(--c-r)",
+         about: "Ты в своей стихии, когда можно работать руками, с техникой и реальными вещами. Тебе важен понятный, ощутимый результат." },
+    I: { name: "Исследовательское", tag: "анализ и наука", color: "var(--c-i)",
+         about: "Тебе нравится думать, анализировать и докапываться до сути. Ты задаёшь вопросы «почему» и «как это устроено»." },
+    A: { name: "Артистическое", tag: "творчество и дизайн", color: "var(--c-a)",
+         about: "Ты мыслишь образами и идеями, замечаешь красоту и хочешь создавать новое, а не следовать строгим шаблонам." },
+    S: { name: "Социальное", tag: "люди и помощь", color: "var(--c-s)",
+         about: "Тебе хорошо рядом с людьми: помогать, учить, поддерживать. Ты чувствуешь настроение других и легко находишь общий язык." },
+    E: { name: "Предприимчивое", tag: "лидерство и бизнес", color: "var(--c-e)",
+         about: "Ты умеешь вести за собой, убеждать и добиваться целей. Тебе интересны бизнес, влияние и большие задачи." },
+    C: { name: "Конвенциональное", tag: "данные и порядок", color: "var(--c-c)",
+         about: "Ты ценишь порядок, точность и систему. Тебе хорошо даётся работа с данными, цифрами и структурой." }
+  };
+  var ORDER = ["R", "I", "A", "S", "E", "C"];
+
+  // ---------- Questions (4 per direction) ----------
+  var QUESTIONS = [
+    { d: "R", t: "Мне нравится чинить и собирать вещи своими руками." },
+    { d: "I", t: "Я люблю решать сложные задачи и головоломки." },
+    { d: "A", t: "Мне нравится придумывать новое: рисунки, тексты, музыку или идеи." },
+    { d: "S", t: "Мне приятно помогать людям и объяснять им что-то." },
+    { d: "E", t: "Мне нравится брать ответственность и вести других за собой." },
+    { d: "C", t: "Мне нравится, когда всё разложено по полочкам и есть чёткий порядок." },
+
+    { d: "R", t: "Я с удовольствием разбираюсь, как устроены механизмы и техника." },
+    { d: "I", t: "Я люблю докапываться до причин: почему всё устроено именно так." },
+    { d: "A", t: "Я замечаю красоту и обращаю внимание на то, как что-то выглядит." },
+    { d: "S", t: "Ко мне часто обращаются за советом или поддержкой." },
+    { d: "E", t: "Я люблю убеждать людей и отстаивать свою точку зрения." },
+    { d: "C", t: "Я аккуратно работаю с цифрами, таблицами и документами." },
+
+    { d: "R", t: "Мне интересно работать с инструментами, приборами и оборудованием." },
+    { d: "I", t: "Мне интересны наука, эксперименты и исследования." },
+    { d: "A", t: "Мне комфортнее там, где можно проявить фантазию, а не следовать строгим правилам." },
+    { d: "S", t: "Я хорошо чувствую настроение других и легко нахожу общий язык." },
+    { d: "E", t: "Мне интересны бизнес, продажи и то, как зарабатываются деньги." },
+    { d: "C", t: "Мне спокойнее, когда есть понятные правила и инструкции." },
+
+    { d: "R", t: "Я бы хотел(а) работать в движении или на выезде, а не только за столом." },
+    { d: "I", t: "Я могу подолгу разбираться в данных, чтобы найти закономерность." },
+    { d: "A", t: "Я с удовольствием занимаюсь творчеством: дизайном, искусством, видео." },
+    { d: "S", t: "Мне было бы приятно работать там, где я напрямую приношу пользу людям." },
+    { d: "E", t: "Я готов(а) рискнуть и взяться за амбициозную цель." },
+    { d: "C", t: "Я внимателен(на) к деталям и люблю доводить дела до конца." }
+  ];
+
+  var OPTIONS = [
+    { t: "Совсем не про меня", v: 0 },
+    { t: "Скорее нет", v: 1 },
+    { t: "Как когда", v: 2 },
+    { t: "Скорее да", v: 3 },
+    { t: "Это точно я", v: 4 }
+  ];
+  var MAX_PER_DIR = 4 * 4; // 4 questions × max 4
+
+  // ---------- Professions (dims drive the matching) ----------
+  var PROFS = [
+    { name: "Разработчик ПО", dims: ["I", "R"],
+      desc: "Создаёт сайты, приложения и сервисы, превращая задачи в работающий код.",
+      subjects: "Информатика, математика, физика, английский",
+      programs: "«Информационные системы», «Программная инженерия», «Computer Science» (AITU, SDU, КБТУ, НУ)" },
+    { name: "Инженер-технолог / промышленный инженер", dims: ["R", "I"],
+      desc: "Настраивает и совершенствует производство: оборудование, процессы, качество.",
+      subjects: "Физика, математика, химия",
+      programs: "«Машиностроение», «Автоматизация», «Нефтегазовое дело» (КазНИТУ им. Сатпаева, AlmaU)" },
+    { name: "Врач", dims: ["I", "S"],
+      desc: "Ставит диагноз и лечит людей, постоянно учится и принимает решения.",
+      subjects: "Биология, химия, математика",
+      programs: "«Общая медицина», «Педиатрия», «Стоматология» (КазНМУ им. Асфендиярова, медуниверситеты)" },
+    { name: "Психолог", dims: ["S", "I"],
+      desc: "Помогает людям разобраться в себе, справиться со стрессом и отношениями.",
+      subjects: "Биология, обществознание, русский/казахский язык",
+      programs: "«Психология», «Педагогика и психология» (КазНУ им. аль-Фараби, ЕНУ им. Гумилёва)" },
+    { name: "Педагог / учитель", dims: ["S", "A"],
+      desc: "Объясняет сложное простыми словами и помогает ученикам расти.",
+      subjects: "Профильный предмет, педагогика, обществознание",
+      programs: "Педагогические специальности по предметам (пединституты, КазНПУ им. Абая)" },
+    { name: "Графический / UX-дизайнер", dims: ["A", "I"],
+      desc: "Делает интерфейсы, логотипы и графику понятными и красивыми.",
+      subjects: "Информатика, искусство/черчение, английский",
+      programs: "«Дизайн», «Графический дизайн», «UX/UI» (КазГАСА, AlmaU, Narxoz)" },
+    { name: "Архитектор", dims: ["A", "R"],
+      desc: "Проектирует здания и пространства — на стыке искусства и инженерии.",
+      subjects: "Математика, физика, черчение, искусство",
+      programs: "«Архитектура», «Дизайн среды» (КазГАСА, КазНИТУ им. Сатпаева)" },
+    { name: "Маркетолог / SMM-специалист", dims: ["E", "A"],
+      desc: "Продвигает продукты, придумывает кампании и работает с аудиторией.",
+      subjects: "Обществознание, математика, английский",
+      programs: "«Маркетинг», «Реклама и PR» (AlmaU, Narxoz, КИМЭП)" },
+    { name: "Предприниматель", dims: ["E", "R"],
+      desc: "Запускает своё дело: находит идею, собирает команду, берёт на себя риск.",
+      subjects: "Математика, обществознание, английский",
+      programs: "«Менеджмент», «Предпринимательство», «Бизнес-администрирование» (AlmaU, КИМЭП, Nazarbayev University)" },
+    { name: "Юрист", dims: ["E", "C"],
+      desc: "Разбирается в законах, защищает интересы людей и организаций.",
+      subjects: "Обществознание, история, русский/казахский язык",
+      programs: "«Юриспруденция», «Международное право» (КазГЮУ им. Нарикбаева, КазНУ им. аль-Фараби)" },
+    { name: "Финансист / бухгалтер", dims: ["C", "I"],
+      desc: "Ведёт учёт, считает бюджеты и помогает принимать денежные решения.",
+      subjects: "Математика, обществознание, информатика",
+      programs: "«Финансы», «Учёт и аудит» (Narxoz, КИМЭП, университет Нархоз)" },
+    { name: "Экономист / банковский специалист", dims: ["C", "E"],
+      desc: "Анализирует рынки и финансы, работает с данными в банках и компаниях.",
+      subjects: "Математика, обществознание, английский",
+      programs: "«Экономика», «Финансы», «Банковское дело» (КИМЭП, Narxoz, ЕНУ им. Гумилёва)" },
+    { name: "Специалист госслужбы / госуправления", dims: ["C", "S"],
+      desc: "Работает в государственных органах: проекты, документы, услуги для людей.",
+      subjects: "Обществознание, история, языки",
+      programs: "«Государственное и местное управление», «Публичная политика» (Академия госуправления, ЕНУ им. Гумилёва)" },
+    { name: "Data-аналитик", dims: ["I", "C"],
+      desc: "Находит в данных закономерности и превращает их в понятные выводы.",
+      subjects: "Математика, информатика, английский",
+      programs: "«Анализ данных», «Прикладная математика», «Статистика» (AITU, SDU, Nazarbayev University)" },
+    { name: "Журналист / создатель контента", dims: ["A", "S"],
+      desc: "Рассказывает истории: пишет тексты, снимает видео, ведёт блоги и медиа.",
+      subjects: "Русский/казахский язык, обществознание, история",
+      programs: "«Журналистика», «Медиакоммуникации» (КазНУ им. аль-Фараби, КИМЭП)" },
+    { name: "Агроном / инженер сельского хозяйства", dims: ["R", "I"],
+      desc: "Отвечает за урожай и современные технологии в сельском хозяйстве.",
+      subjects: "Биология, химия, математика",
+      programs: "«Агрономия», «Агроинженерия» (КазНАИУ, Казахский агротехнический университет им. Жангир хана)" },
+    { name: "Медсестра / фельдшер", dims: ["S", "R"],
+      desc: "Заботится о пациентах, выполняет процедуры и поддерживает людей рядом.",
+      subjects: "Биология, химия",
+      programs: "«Сестринское дело», «Лечебное дело» (медколледжи, медуниверситеты)" },
+    { name: "Логист / специалист по снабжению", dims: ["C", "E"],
+      desc: "Организует перевозки, склады и поставки так, чтобы всё приходило вовремя.",
+      subjects: "Математика, география, обществознание",
+      programs: "«Логистика», «Организация перевозок» (КазАТК им. Тынышпаева, университет Нархоз)" }
+  ];
+
+  // ---------- State ----------
+  var answers = new Array(QUESTIONS.length).fill(null);
+  var current = 0;
+
+  // ---------- Elements ----------
+  var $ = function (id) { return document.getElementById(id); };
+  var screens = {
+    welcome: $("screen-welcome"),
+    test: $("screen-test"),
+    result: $("screen-result")
+  };
+
+  function show(name) {
+    Object.keys(screens).forEach(function (k) { screens[k].hidden = (k !== name); });
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }
+
+  // ---------- Welcome: directions preview ----------
+  (function buildDirGrid() {
+    var g = $("dirGrid");
+    ORDER.forEach(function (k) {
+      var d = DIRS[k];
+      var el = document.createElement("div");
+      el.className = "dir-card";
+      el.innerHTML =
+        '<span class="dir-dot" style="background:' + d.color + '"></span>' +
+        '<div><b>' + d.name + '</b><span>' + d.tag + '</span></div>';
+      g.appendChild(el);
+    });
+  })();
+
+  // ---------- Test rendering ----------
+  $("qTotal").textContent = QUESTIONS.length;
+
+  function renderQuestion(direction) {
+    var q = QUESTIONS[current];
+    var d = DIRS[q.d];
+    var card = $("qCard");
+
+    $("qNum").textContent = current + 1;
+    $("progBar").style.width = ((current) / QUESTIONS.length * 100) + "%";
+
+    var tag = $("qTag");
+    tag.textContent = d.name + " · " + d.tag;
+    tag.style.color = d.color;
+    $("qText").textContent = q.t;
+
+    var opts = $("opts");
+    opts.innerHTML = "";
+    OPTIONS.forEach(function (o) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "opt" + (answers[current] === o.v ? " sel" : "");
+      b.innerHTML = '<span class="dot"></span><span>' + o.t + '</span>';
+      b.addEventListener("click", function () { choose(o.v); });
+      opts.appendChild(b);
+    });
+
+    // transition animation
+    card.classList.remove("anim-in", "anim-back");
+    void card.offsetWidth; // reflow to restart animation
+    card.classList.add(direction === "back" ? "anim-back" : "anim-in");
+
+    $("backBtn").disabled = (current === 0);
+    updateNextBtn();
+  }
+
+  function updateNextBtn() {
+    var btn = $("nextBtn");
+    var answered = answers[current] !== null;
+    btn.disabled = !answered;
+    btn.textContent = (current === QUESTIONS.length - 1) ? "Показать результат →" : "Далее →";
+  }
+
+  function choose(v) {
+    answers[current] = v;
+    var opts = $("opts").children;
+    for (var i = 0; i < opts.length; i++) {
+      opts[i].classList.toggle("sel", OPTIONS[i].v === v);
+    }
+    updateNextBtn();
+  }
+
+  function next() {
+    if (answers[current] === null) return;
+    if (current === QUESTIONS.length - 1) {
+      $("progBar").style.width = "100%";
+      showResult();
+      return;
+    }
+    current++;
+    renderQuestion("fwd");
+  }
+
+  function back() {
+    if (current === 0) return;
+    current--;
+    renderQuestion("back");
+  }
+
+  // ---------- Scoring ----------
+  function computeScores() {
+    var s = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 };
+    QUESTIONS.forEach(function (q, i) {
+      s[q.d] += (answers[i] || 0);
+    });
+    return s;
+  }
+
+  function pct(score) { return Math.round(score / MAX_PER_DIR * 100); }
+
+  // ---------- Result rendering ----------
+  function showResult() {
+    var scores = computeScores();
+    var percents = {};
+    ORDER.forEach(function (k) { percents[k] = pct(scores[k]); });
+
+    var ranked = ORDER.slice().sort(function (a, b) { return scores[b] - scores[a]; });
+
+    renderBars(scores, percents, ranked);
+    renderTops(ranked);
+    renderProfs(percents, ranked);
+
+    show("result");
+    // animate bars after paint
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        var fills = document.querySelectorAll("#bars .track > i");
+        fills.forEach(function (el) { el.style.width = el.dataset.w + "%"; });
+      });
+    });
+  }
+
+  function renderBars(scores, percents, ranked) {
+    var box = $("bars");
+    box.innerHTML = "";
+    // show in canonical RIASEC order for readability
+    ORDER.forEach(function (k) {
+      var d = DIRS[k];
+      var isTop = ranked.indexOf(k) < 3;
+      var row = document.createElement("div");
+      row.className = "bar-row";
+      row.innerHTML =
+        '<div class="bar-top">' +
+          '<span class="bar-name"><span class="sw" style="background:' + d.color + '"></span>' +
+            d.name + ' <small>' + d.tag + '</small></span>' +
+          '<span class="bar-val">' + percents[k] + '%</span>' +
+        '</div>' +
+        '<div class="track"><i data-w="' + percents[k] + '" style="background:' + d.color +
+          (isTop ? "" : ";opacity:.75") + '"></i></div>';
+      box.appendChild(row);
+    });
+  }
+
+  function renderTops(ranked) {
+    var box = $("tops");
+    box.innerHTML = "";
+    var labels = ["Ведущее направление", "Второе направление", "Третье направление"];
+    ranked.slice(0, 3).forEach(function (k, idx) {
+      var d = DIRS[k];
+      var card = document.createElement("div");
+      card.className = "top-card";
+      card.style.borderLeftColor = d.color;
+      card.innerHTML =
+        '<div class="tc-head"><h4>' + d.name + '</h4>' +
+        '<span class="rank">' + labels[idx] + '</span></div>' +
+        '<p>' + d.about + '</p>';
+      box.appendChild(card);
+    });
+  }
+
+  function renderProfs(percents, ranked) {
+    var scored = PROFS.map(function (p) {
+      var sum = 0;
+      p.dims.forEach(function (k) { sum += percents[k]; });
+      return { p: p, match: Math.round(sum / p.dims.length) };
+    });
+    scored.sort(function (a, b) {
+      if (b.match !== a.match) return b.match - a.match;
+      // tie-break: profession whose first dim ranks higher
+      return ranked.indexOf(a.p.dims[0]) - ranked.indexOf(b.p.dims[0]);
+    });
+
+    var grid = $("profGrid");
+    grid.innerHTML = "";
+    scored.slice(0, 6).forEach(function (item) {
+      var p = item.p;
+      var tags = p.dims.map(function (k) {
+        return '<span style="background:' + DIRS[k].color + '">' + DIRS[k].name + '</span>';
+      }).join("");
+      var card = document.createElement("div");
+      card.className = "prof";
+      card.innerHTML =
+        '<div class="prof-top"><h4>' + p.name + '</h4>' +
+          '<span class="match">' + item.match + '% совпадения</span></div>' +
+        '<div class="tags">' + tags + '</div>' +
+        '<div class="pdesc">' + p.desc + '</div>' +
+        '<dl>' +
+          '<div class="field"><b>Важные предметы</b>' + p.subjects + '</div>' +
+          '<div class="field"><b>Куда поступать</b>' + p.programs + '</div>' +
+        '</dl>';
+      grid.appendChild(card);
+    });
+  }
+
+  // ---------- Flow control ----------
+  function startTest() {
+    answers = new Array(QUESTIONS.length).fill(null);
+    current = 0;
+    show("test");
+    renderQuestion("fwd");
+  }
+
+  $("startBtn").addEventListener("click", startTest);
+  $("restartBtn").addEventListener("click", startTest);
+  $("nextBtn").addEventListener("click", next);
+  $("backBtn").addEventListener("click", back);
+
+  // keyboard: 1–5 to answer, arrows to navigate
+  document.addEventListener("keydown", function (e) {
+    if (screens.test.hidden) return;
+    if (e.key >= "1" && e.key <= "5") {
+      choose(OPTIONS[parseInt(e.key, 10) - 1].v);
+    } else if (e.key === "ArrowRight" || e.key === "Enter") {
+      if (!$("nextBtn").disabled) next();
+    } else if (e.key === "ArrowLeft") {
+      back();
+    }
+  });
+
+  show("welcome");
+})();
+</script>
