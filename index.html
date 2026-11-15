@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>MamanBol — профориентация</title>
+  <meta name="description" content="MamanBol — подбор профессии под твои сильные стороны по модели RIASEC.">
+  <meta name="theme-color" content="#0e7c74">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@600;700&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ===== Top bar ===== -->
+  <header class="topbar" id="topbar" hidden>
+    <div class="brand">
+      <span class="mark">M</span>
+      <span class="brand-name display">MamanBol</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="installBtn" hidden title="Установить приложение">⤓ Установить</button>
+      <button class="icon-btn" id="themeBtn" title="Сменить тему">◐</button>
+      <span class="user-email" id="userEmail"></span>
+      <button class="icon-btn" id="logoutBtn" hidden>Выйти</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- ===== Loading ===== -->
+    <section id="view-loading" class="view">
+      <div class="center-col">
+        <span class="mark big">M</span>
+        <p class="muted">Загрузка…</p>
+      </div>
+    </section>
+
+    <!-- ===== Auth ===== -->
+    <section id="view-auth" class="view" hidden>
+      <div class="auth-card">
+        <div class="auth-head">
+          <span class="mark big">M</span>
+          <h1 class="display">MamanBol</h1>
+          <p class="muted">Поможем подобрать профессию под твои сильные стороны.</p>
+        </div>
+
+        <div class="tabs">
+          <button class="tab active" id="tabLogin" type="button">Вход</button>
+          <button class="tab" id="tabSignup" type="button">Регистрация</button>
+        </div>
+
+        <form id="authForm" autocomplete="on">
+          <label class="field" id="nameField">
+            <span>Имя</span>
+            <input type="text" id="inpName" placeholder="Как тебя зовут?" autocomplete="name">
+          </label>
+          <label class="field">
+            <span>Email</span>
+            <input type="email" id="inpEmail" placeholder="you@example.com" autocomplete="email" required>
+          </label>
+          <label class="field">
+            <span>Пароль</span>
+            <input type="password" id="inpPass" placeholder="Минимум 6 символов" autocomplete="current-password" required minlength="6">
+          </label>
+          <p class="form-msg" id="authMsg" hidden></p>
+          <button class="btn full" id="authSubmit" type="submit">Войти</button>
+        </form>
+        <div class="or-sep"><span>или</span></div>
+        <button class="btn ghost full" id="guestBtn" type="button">Попробовать без регистрации</button>
+        <p class="muted small center" id="authHint">Нет аккаунта? Нажми «Регистрация».</p>
+      </div>
+    </section>
+
+    <!-- ===== Home ===== -->
+    <section id="view-home" class="view" hidden>
+      <div class="hero">
+        <div class="eyebrow">Профориентация по модели RIASEC</div>
+        <h1 class="display" id="helloName">Привет!</h1>
+        <p class="lead">30 вопросов — и ты увидишь свои сильные направления и профессии, которые тебе подходят, с процентом совпадения, нужными предметами и вузами Казахстана.</p>
+        <div class="meta-row">
+          <span class="chip">30 вопросов</span>
+          <span class="chip">≈ 7 минут</span>
+          <span class="chip">6 направлений + предметы</span>
+        </div>
+        <div class="dir-grid" id="dirGrid"></div>
+        <div class="home-actions">
+          <button class="btn" id="startBtn">Пройти тест →</button>
+          <button class="btn ghost" id="historyBtn">Мои результаты</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Test ===== -->
+    <section id="view-test" class="view" hidden>
+      <div class="test-head">
+        <div class="block-tag" id="blockTag">Блок 1 · склонности</div>
+        <div class="counter"><b id="qNum">1</b> / <span id="qTotal">30</span></div>
+      </div>
+      <div class="progress"><i id="progBar"></i></div>
+
+      <div class="qcard" id="qCard">
+        <div class="q-tag" id="qTag"></div>
+        <h2 class="q-text" id="qText"></h2>
+        <div class="opts" id="opts"></div>
+      </div>
+
+      <div class="test-nav">
+        <button class="btn ghost" id="backBtn">← Назад</button>
+        <button class="btn" id="nextBtn" disabled>Далее →</button>
+      </div>
+    </section>
+
+    <!-- ===== Result ===== -->
+    <section id="view-result" class="view" hidden>
+      <div class="res-head">
+        <div class="eyebrow" id="resEyebrow">Твой результат</div>
+        <h2 class="display">Вот что показал тест</h2>
+      </div>
+
+      <div class="panel">
+        <h3>Баллы по 6 направлениям</h3>
+        <div class="sub">Чем длиннее полоса, тем ближе тебе это направление.</div>
+        <div class="bars" id="bars"></div>
+      </div>
+
+      <div class="panel">
+        <h3>Твои ведущие направления</h3>
+        <div class="sub">На них стоит опираться при выборе профессии.</div>
+        <div class="tops" id="tops"></div>
+      </div>
+
+      <div class="panel">
+        <h3>Профессии, которые тебе подходят</h3>
+        <div class="sub">Отсортированы по проценту совпадения с твоим профилем.</div>
+        <div class="prof-grid" id="profGrid"></div>
+      </div>
+
+      <p class="save-msg" id="saveMsg" hidden></p>
+      <div class="res-actions">
+        <button class="btn" id="restartBtn">↻ Пройти заново</button>
+        <button class="btn ghost" id="toHistoryBtn">Мои результаты</button>
+      </div>
+      <p class="foot">MamanBol — ориентир, а не приговор. Окончательный выбор всегда за тобой.</p>
+    </section>
+
+    <!-- ===== History ===== -->
+    <section id="view-history" class="view" hidden>
+      <div class="res-head">
+        <div class="eyebrow">История</div>
+        <h2 class="display">Мои результаты</h2>
+      </div>
+      <div id="historyList" class="history-list"></div>
+      <div class="res-actions">
+        <button class="btn" id="histStartBtn">Пройти тест заново</button>
+        <button class="btn ghost" id="histHomeBtn">На главную</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Supabase SDK (UMD global `supabase`) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/dist/umd/supabase.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
