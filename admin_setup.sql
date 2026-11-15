@@ -1,11 +1,10 @@
 -- ============================================================
 -- MamanBol — встроенная админ-панель (безопасно, без секретного ключа)
--- Выполнить ОДИН раз: Supabase → SQL Editor → New query → вставить всё → Run.
+-- Выполнить ОДИН раз: Supabase -> SQL Editor -> New query -> вставить всё -> Run.
 --
--- Как это работает: функции помечены SECURITY DEFINER (выполняются с правами
--- владельца БД и потому видят auth.users), но каждая сначала проверяет, что
--- вызвавший вошёл под email-ом администратора. Обычный пользователь получит
--- "Доступ запрещён". В браузер попадает только публичный ключ.
+-- Функции помечены SECURITY DEFINER (видят auth.users), но каждая сначала
+-- проверяет, что вызвавший вошёл под email администратора. Обычный
+-- пользователь получит "Доступ запрещён". В браузер идёт только публичный ключ.
 -- ============================================================
 
 -- 1) Кто админ (поменяй/дополни список при необходимости)
@@ -15,12 +14,12 @@ language sql
 stable
 security definer
 set search_path = public
-as $$
+as $is_admin$
   select coalesce((auth.jwt() ->> 'email') in (
     'bekzatismagulov3@gmail.com',
     'bekzatismagulo3@gmail.com'
   ), false);
-$$;
+$is_admin$;
 
 -- 2) Список всех пользователей + сколько раз проходили тест
 create or replace function public.admin_list_users()
@@ -36,7 +35,7 @@ language plpgsql
 stable
 security definer
 set search_path = public
-as $$
+as $list_users$
 begin
   if not public.is_admin() then raise exception 'Доступ запрещён'; end if;
   return query
@@ -51,7 +50,7 @@ begin
     group by u.id
     order by u.created_at desc;
 end;
-$$;
+$list_users$;
 
 -- 3) Все прохождения теста с email и именем
 create or replace function public.admin_list_results()
@@ -68,7 +67,7 @@ language plpgsql
 stable
 security definer
 set search_path = public
-as $$
+as $list_results$
 begin
   if not public.is_admin() then raise exception 'Доступ запрещён'; end if;
   return query
@@ -83,7 +82,7 @@ begin
     join auth.users u on u.id = r.user_id
     order by r.created_at desc;
 end;
-$$;
+$list_results$;
 
 -- 4) Удалить одно прохождение теста
 create or replace function public.admin_delete_result(p_id uuid)
@@ -91,12 +90,12 @@ returns void
 language plpgsql
 security definer
 set search_path = public
-as $$
+as $del_result$
 begin
   if not public.is_admin() then raise exception 'Доступ запрещён'; end if;
   delete from public.results where id = p_id;
 end;
-$$;
+$del_result$;
 
 -- 5) Удалить пользователя целиком (его результаты удалятся автоматически)
 create or replace function public.admin_delete_user(p_id uuid)
@@ -104,17 +103,17 @@ returns void
 language plpgsql
 security definer
 set search_path = public
-as $$
+as $del_user$
 begin
   if not public.is_admin() then raise exception 'Доступ запрещён'; end if;
   delete from auth.users where id = p_id;
 end;
-$$;
+$del_user$;
 
 -- 6) Разрешить вызывать эти функции вошедшим пользователям
 --    (внутри всё равно стоит проверка is_admin)
-grant execute on function public.is_admin()            to authenticated;
-grant execute on function public.admin_list_users()    to authenticated;
-grant execute on function public.admin_list_results()  to authenticated;
+grant execute on function public.is_admin()                to authenticated;
+grant execute on function public.admin_list_users()        to authenticated;
+grant execute on function public.admin_list_results()      to authenticated;
 grant execute on function public.admin_delete_result(uuid) to authenticated;
 grant execute on function public.admin_delete_user(uuid)   to authenticated;
