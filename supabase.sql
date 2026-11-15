@@ -18,17 +18,22 @@ create index if not exists results_user_created_idx
 -- включаем защиту на уровне строк
 alter table public.results enable row level security;
 
+-- drop if exists → можно безопасно запускать повторно без ошибки "already exists"
+
 -- каждый видит только свои результаты
+drop policy if exists "results_select_own" on public.results;
 create policy "results_select_own"
   on public.results for select
   using (auth.uid() = user_id);
 
 -- каждый может добавлять только свои результаты
+drop policy if exists "results_insert_own" on public.results;
 create policy "results_insert_own"
   on public.results for insert
   with check (auth.uid() = user_id);
 
 -- (по желанию) удалять только свои
+drop policy if exists "results_delete_own" on public.results;
 create policy "results_delete_own"
   on public.results for delete
   using (auth.uid() = user_id);
