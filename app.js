@@ -2,8 +2,8 @@
    MamanBol — app.js
    ВСТАВЬ СЮДА СВОИ КЛЮЧИ SUPABASE (Project Settings → API)
    ============================================================ */
-const SUPABASE_URL = "СЮДА_ВСТАВИТЬ";       // например: https://abcdxyz.supabase.co
-const SUPABASE_ANON_KEY = "СЮДА_ВСТАВИТЬ";  // длинный ключ "anon public"
+const SUPABASE_URL = "https://ymcnxtlzfilgaqgewxla.supabase.co";              // Project URL
+const SUPABASE_ANON_KEY = "sb_publishable_M-MeO0aymJIuRI1LB1fMUg_zIIwwwoa";  // публичный (publishable) ключ
 /* ============================================================ */
 
 (function () {
