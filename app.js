@@ -165,7 +165,13 @@ const SUPABASE_ANON_KEY = "sb_publishable_M-MeO0aymJIuRI1LB1fMUg_zIIwwwoa";  // 
   const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
-  const views = ["loading", "auth", "home", "test", "result", "history"];
+  // Админы приложения (кто видит «Админ-панель»). Должно совпадать с is_admin() в admin_setup.sql
+  const ADMIN_EMAILS = ["bekzatismagulov3@gmail.com", "bekzatismagulo3@gmail.com"];
+  function isAdminUser(user) {
+    return !!(user && user.email && ADMIN_EMAILS.indexOf(user.email.toLowerCase()) !== -1);
+  }
+
+  const views = ["loading", "auth", "home", "test", "result", "history", "admin"];
   function show(name) {
     views.forEach((v) => { const n = $("view-" + v); if (n) n.hidden = (v !== name); });
     $("topbar").hidden = (name === "loading" || name === "auth");
@@ -303,6 +309,7 @@ const SUPABASE_ANON_KEY = "sb_publishable_M-MeO0aymJIuRI1LB1fMUg_zIIwwwoa";  // 
     currentUser = { id: "guest", email: "", user_metadata: { full_name: name }, guest: true };
     $("userEmail").innerHTML = '<span class="guest-badge">гостевой режим</span>';
     $("logoutBtn").hidden = false;
+    $("adminBtn").hidden = true;
     $("logoutBtn").textContent = "Выйти";
     $("helloName").textContent = "Привет, " + displayName(currentUser) + "!";
     show("home");
@@ -325,8 +332,10 @@ const SUPABASE_ANON_KEY = "sb_publishable_M-MeO0aymJIuRI1LB1fMUg_zIIwwwoa";  // 
 
   function onLoggedIn(user) {
     currentUser = user;
+    isGuest = false;
     $("userEmail").textContent = user.email || "";
     $("logoutBtn").hidden = false;
+    $("adminBtn").hidden = !isAdminUser(user);
     $("helloName").textContent = "Привет, " + displayName(user) + "!";
     show("home");
   }
@@ -647,6 +656,119 @@ const SUPABASE_ANON_KEY = "sb_publishable_M-MeO0aymJIuRI1LB1fMUg_zIIwwwoa";  // 
       box.innerHTML = '<p class="hist-empty">Не удалось загрузить историю: ' + esc(e.message || "ошибка") + '</p>';
     }
   }
+
+  /* ============================================================
+     Admin panel (RPC → admin_setup.sql)
+     ============================================================ */
+  let adminTab = "users";
+
+  function adminMsg(text, kind) {
+    const m = $("adminMsg");
+    if (!text) { m.hidden = true; return; }
+    m.hidden = false; m.className = "form-msg " + (kind || "err"); m.textContent = text;
+  }
+
+  function adminRpcError(e) {
+    const msg = (e && e.message ? e.message : "").toLowerCase();
+    if (msg.includes("доступ запрещён") || msg.includes("access")) return "Доступ запрещён: этот аккаунт не админ.";
+    if (msg.includes("could not find") || msg.includes("function") || msg.includes("does not exist") || msg.includes("pgrst")) {
+      return "Функции админки не найдены в базе. Выполни admin_setup.sql в Supabase → SQL Editor.";
+    }
+    return (e && e.message) ? e.message : "Не удалось загрузить данные.";
+  }
+
+  function openAdmin() {
+    if (!isAdminUser(currentUser)) { show("home"); return; }
+    show("admin");
+    setAdminTab("users");
+  }
+
+  function setAdminTab(tab) {
+    adminTab = tab;
+    $("atabUsers").classList.toggle("active", tab === "users");
+    $("atabResults").classList.toggle("active", tab === "results");
+    if (tab === "users") loadAdminUsers(); else loadAdminResults();
+  }
+
+  async function loadAdminUsers() {
+    const box = $("adminContent");
+    adminMsg("");
+    box.innerHTML = '<p class="admin-empty">Загрузка…</p>';
+    try {
+      const { data, error } = await sb.rpc("admin_list_users");
+      if (error) throw error;
+      if (!data || !data.length) { box.innerHTML = '<p class="admin-empty">Пользователей пока нет.</p>'; return; }
+      box.innerHTML = "";
+      data.forEach((u) => {
+        const reg = new Date(u.created_at).toLocaleDateString("ru-RU", { day: "2-digit", month: "short", year: "numeric" });
+        const last = u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleDateString("ru-RU", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+        const row = el("div", "admin-row",
+          '<div class="ar-main">' +
+            '<div class="ar-email">' + esc(u.email || "—") + '</div>' +
+            '<div class="ar-sub">' + esc(u.name || "без имени") + ' · рег. ' + reg + ' · вход ' + last + '</div>' +
+            '<span class="ar-count">прохождений: ' + (u.results_count || 0) + '</span>' +
+          '</div>');
+        const btn = el("button", "del-btn", "Удалить");
+        btn.addEventListener("click", () => deleteUser(u.user_id, u.email));
+        row.appendChild(btn);
+        box.appendChild(row);
+      });
+    } catch (e) { box.innerHTML = ""; adminMsg(adminRpcError(e), "err"); }
+  }
+
+  async function loadAdminResults() {
+    const box = $("adminContent");
+    adminMsg("");
+    box.innerHTML = '<p class="admin-empty">Загрузка…</p>';
+    try {
+      const { data, error } = await sb.rpc("admin_list_results");
+      if (error) throw error;
+      if (!data || !data.length) { box.innerHTML = '<p class="admin-empty">Прохождений пока нет.</p>'; return; }
+      box.innerHTML = "";
+      data.forEach((r) => {
+        const date = new Date(r.created_at).toLocaleString("ru-RU", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
+        const top3 = (r.scores && r.scores.top3 || []).map((k) => DIRS[k] ? DIRS[k].name : k).join(" · ");
+        const profs = (r.top_professions || []).slice(0, 4).map((p) => '<span>' + esc(p.name) + ' · ' + p.match + '%</span>').join("");
+        const row = el("div", "admin-row",
+          '<div class="ar-main">' +
+            '<div class="ar-email">' + esc(r.email || "—") + '</div>' +
+            '<div class="ar-sub">' + esc(r.name || "") + ' · ' + esc(date) + '</div>' +
+            '<div class="ar-sub dirs">' + esc(top3 || "—") + '</div>' +
+            '<div class="ar-profs">' + profs + '</div>' +
+          '</div>');
+        const btn = el("button", "del-btn", "Удалить");
+        btn.addEventListener("click", () => deleteResult(r.id));
+        row.appendChild(btn);
+        box.appendChild(row);
+      });
+    } catch (e) { box.innerHTML = ""; adminMsg(adminRpcError(e), "err"); }
+  }
+
+  async function deleteResult(id) {
+    if (!window.confirm("Удалить это прохождение теста?")) return;
+    try {
+      const { error } = await sb.rpc("admin_delete_result", { p_id: id });
+      if (error) throw error;
+      loadAdminResults();
+    } catch (e) { adminMsg(adminRpcError(e), "err"); }
+  }
+
+  async function deleteUser(id, email) {
+    if (!window.confirm("Удалить пользователя " + (email || "") + "?\nЕго результаты тоже удалятся. Действие необратимо.")) return;
+    try {
+      const { error } = await sb.rpc("admin_delete_user", { p_id: id });
+      if (error) throw error;
+      loadAdminUsers();
+    } catch (e) {
+      adminMsg("Не удалось удалить аккаунт через приложение (" + (e.message || "ошибка") + "). Удали его в Supabase → Authentication → Users.", "err");
+    }
+  }
+
+  $("adminBtn").addEventListener("click", openAdmin);
+  $("adminHomeBtn").addEventListener("click", () => show("home"));
+  $("adminRefreshBtn").addEventListener("click", () => setAdminTab(adminTab));
+  $("atabUsers").addEventListener("click", () => setAdminTab("users"));
+  $("atabResults").addEventListener("click", () => setAdminTab("results"));
 
   /* ============================================================
      PWA: install prompt + service worker

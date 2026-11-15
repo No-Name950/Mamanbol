@@ -256,6 +256,29 @@ button { font-family: inherit; cursor: pointer; }
 .hist-profs span { font-size: 12.5px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; }
 .hist-empty { text-align: center; color: var(--muted); padding: 40px 0; }
 
+/* ===== Admin ===== */
+.admin-tabs { max-width: 360px; margin: 14px 0 18px; }
+.admin-content { display: flex; flex-direction: column; gap: 10px; }
+.admin-row {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 13px;
+  padding: 14px 16px; box-shadow: var(--shadow);
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+}
+.admin-row .ar-main { min-width: 0; flex: 1; }
+.admin-row .ar-email { font-weight: 700; font-size: 15px; word-break: break-word; }
+.admin-row .ar-sub { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+.admin-row .ar-sub.dirs { color: var(--ink); font-weight: 600; margin-top: 6px; font-size: 13.5px; }
+.admin-row .ar-profs { margin-top: 7px; display: flex; flex-wrap: wrap; gap: 6px; }
+.admin-row .ar-profs span { font-size: 12px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; }
+.admin-row .ar-count { display: inline-block; font-size: 12px; font-weight: 600; color: var(--accent-ink); background: var(--accent-soft); border-radius: 999px; padding: 2px 9px; margin-top: 6px; }
+.del-btn {
+  flex: none; border: 1px solid color-mix(in srgb, var(--danger) 40%, var(--line));
+  background: transparent; color: var(--danger); border-radius: 10px;
+  padding: 7px 12px; font-size: 13px; font-weight: 600; white-space: nowrap;
+}
+.del-btn:hover { background: color-mix(in srgb, var(--danger) 12%, transparent); }
+.admin-empty { text-align: center; color: var(--muted); padding: 36px 0; }
+
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }

@@ -92,6 +92,7 @@
         <div class="home-actions">
           <button class="btn" id="startBtn">Пройти тест →</button>
           <button class="btn ghost" id="historyBtn">Мои результаты</button>
+          <button class="btn ghost" id="adminBtn" hidden>⚙ Админ-панель</button>
         </div>
       </div>
     </section>
@@ -147,6 +148,24 @@
         <button class="btn ghost" id="toHistoryBtn">Мои результаты</button>
       </div>
       <p class="foot">MamanBol — ориентир, а не приговор. Окончательный выбор всегда за тобой.</p>
+    </section>
+
+    <!-- ===== Admin ===== -->
+    <section id="view-admin" class="view" hidden>
+      <div class="res-head">
+        <div class="eyebrow">Только для администратора</div>
+        <h2 class="display">Админ-панель</h2>
+      </div>
+      <div class="tabs admin-tabs">
+        <button class="tab active" id="atabUsers" type="button">Пользователи</button>
+        <button class="tab" id="atabResults" type="button">Результаты</button>
+      </div>
+      <p class="form-msg" id="adminMsg" hidden></p>
+      <div id="adminContent" class="admin-content"></div>
+      <div class="res-actions">
+        <button class="btn ghost" id="adminRefreshBtn">↻ Обновить</button>
+        <button class="btn ghost" id="adminHomeBtn">На главную</button>
+      </div>
     </section>
 
     <!-- ===== History ===== -->
